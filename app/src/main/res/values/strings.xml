@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TestApplication</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="take_test">Take Test</string>
+    <string name="capturing_single_image">Capturing Single Image</string>
+</resources>

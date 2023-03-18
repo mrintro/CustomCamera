@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/homeFragment"
+    android:id="@+id/app_navigation">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="aniket.testapplication.ui.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+
+        <action
+            android:id="@+id/actionHomeToSingleImageFragment"
+            app:destination="@id/singleImageFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/singleImageFragment"
+        android:name="aniket.testapplication.ui.SingleImageFragment"
+        android:label="fragment_single_image"
+        tools:layout="@layout/fragment_single_image" />
+
+</navigation>
