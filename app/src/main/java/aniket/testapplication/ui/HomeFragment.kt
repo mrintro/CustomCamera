@@ -1,7 +1,10 @@
 package aniket.testapplication.ui
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -28,14 +31,48 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         super.onViewCreated(view, savedInstanceState)
         DataBindingUtil.bind<FragmentHomeBinding>(view)?.apply {
 
-            nameTextView.text = mainViewModel.num.toString()
+            lifecycleOwner = viewLifecycleOwner
+            vm = mainViewModel
+
+
+            nameEditText.addTextChangedListener(nameEditTextWatcher)
+            emailEditText.addTextChangedListener(emailEditTextWatcher)
+
 
             takeTestButton.setOnClickListener {
                 findNavController().navigate(HomeFragmentDirections.actionHomeToSingleImageFragment())
             }
 
-            mainViewModel.addCounter()
+        }
 
+    }
+
+    val nameEditTextWatcher = object : TextWatcher{
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            // No implementation
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            mainViewModel.setNameTextField(s.toString())
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+            // No implementation
+        }
+
+    }
+
+    val emailEditTextWatcher = object : TextWatcher{
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            // No implementation
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            mainViewModel.setEmailTextField(s.toString())
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+            // No implementation
         }
 
     }

@@ -6,7 +6,6 @@ import aniket.testapplication.model.UserData
 
 @Database(entities = [UserData::class], version = 1)
 abstract class ProjectDB : RoomDatabase() {
-
     abstract fun getProjectDao() : ProjectDao
 
 }
