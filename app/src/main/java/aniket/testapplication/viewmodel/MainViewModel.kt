@@ -15,6 +15,7 @@ class MainViewModel : ViewModel(), DefaultLifecycleObserver {
     private val emailTextField = MutableLiveData<String>()
 
     val preFetchUserData = MutableLiveData<UserData>()
+    val navigateToCameraScreen = MutableLiveData(false)
 
     @Inject
     lateinit var projectRepository: ProjectRepository
@@ -30,7 +31,8 @@ class MainViewModel : ViewModel(), DefaultLifecycleObserver {
         projectRepository.fetchUserFromDB().fold({
             Log.e("ERROR", "Failed to get user data")
         }, {
-            preFetchUserData.postValue(it[0])
+            if(it.isNotEmpty())
+                preFetchUserData.postValue(it[0])
         })
     }
 
@@ -42,7 +44,7 @@ class MainViewModel : ViewModel(), DefaultLifecycleObserver {
         emailTextField.value = emailValue
     }
 
-    fun onTakeTestClicked() : Unit {
+    fun onTakeTestClicked() {
         createUserObject()?.let {
             CoroutineScope(Dispatchers.Default).launch {
                 populateUserInDB(it)
@@ -57,11 +59,7 @@ class MainViewModel : ViewModel(), DefaultLifecycleObserver {
             projectRepository.populateUserInDB(userData).fold({
                 Log.e("ERROR", "Failed to save user data")
             }, {
-                projectRepository.fetchUserFromDB().fold({
-
-                }, {
-                    Log.d("DEBUG", "user list $it")
-                })
+                navigateToCameraScreen.postValue(true)
             })
         })
     }

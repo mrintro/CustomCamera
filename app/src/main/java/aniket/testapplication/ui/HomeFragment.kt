@@ -27,20 +27,22 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
         DataBindingUtil.bind<FragmentHomeBinding>(view)?.apply {
 
             lifecycleOwner = viewLifecycleOwner
             vm = mainViewModel
+            mainViewModel.navigateToCameraScreen.observe(viewLifecycleOwner) {
+                if(it==true){
+                    mainViewModel.navigateToCameraScreen.postValue(false)
+                    navigateToCameraScreen()
+                }
+            }
 
 
             nameEditText.addTextChangedListener(nameEditTextWatcher)
             emailEditText.addTextChangedListener(emailEditTextWatcher)
-
-
-            takeTestButton.setOnClickListener {
-                findNavController().navigate(HomeFragmentDirections.actionHomeToSingleImageFragment())
-            }
 
         }
 
@@ -59,6 +61,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             // No implementation
         }
 
+    }
+
+    private fun navigateToCameraScreen() {
+        findNavController().navigate(HomeFragmentDirections.actionHomeToSingleImageFragment())
     }
 
     val emailEditTextWatcher = object : TextWatcher{
