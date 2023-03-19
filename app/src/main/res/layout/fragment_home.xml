@@ -23,6 +23,7 @@
 
         <EditText
             android:id="@+id/nameEditText"
+            android:text="@{vm.preFetchUserData.name}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
@@ -41,6 +42,7 @@
 
         <EditText
             android:id="@+id/emailEditText"
+            android:text="@{vm.preFetchUserData.email}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"

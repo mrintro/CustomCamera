@@ -1,10 +1,7 @@
 package aniket.testapplication.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import aniket.testapplication.model.UserData
 import aniket.testapplication.repository.ProjectRepository
 import arrow.core.Either
@@ -18,11 +15,24 @@ class MainViewModel : ViewModel(), DefaultLifecycleObserver {
     private val nameTextField = MutableLiveData<String>()
     private val emailTextField = MutableLiveData<String>()
 
+    val preFetchUserData = MutableLiveData<UserData>()
+
     @Inject
     lateinit var projectRepository: ProjectRepository
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
+        viewModelScope.launch {
+            fetchUserFromDB()
+        }
+    }
+
+    suspend fun fetchUserFromDB() {
+        projectRepository.fetchUserFromDB().fold({
+            Log.e("ERROR", "Failed to get user data")
+        }, {
+            preFetchUserData.postValue(it[0])
+        })
     }
 
     fun setNameTextField(nameValue : String) {
