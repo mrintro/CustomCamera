@@ -13,6 +13,10 @@ class ProjectRepository(
     private val service: APIService
 ) {
 
+
+    suspend fun clearDB() = Either.catch{
+        roomDB.getProjectDao().deleteAllData()
+    }
     suspend fun populateUserInDB(userData: UserData) = Either.catch {
         roomDB.getProjectDao().addUser(userData)
     }

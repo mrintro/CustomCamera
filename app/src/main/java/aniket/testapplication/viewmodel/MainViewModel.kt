@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.*
 import aniket.testapplication.model.UserData
 import aniket.testapplication.repository.ProjectRepository
-import arrow.core.Either
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,7 +26,7 @@ class MainViewModel : ViewModel(), DefaultLifecycleObserver {
         }
     }
 
-    suspend fun fetchUserFromDB() {
+    private suspend fun fetchUserFromDB() {
         projectRepository.fetchUserFromDB().fold({
             Log.e("ERROR", "Failed to get user data")
         }, {
@@ -52,13 +51,17 @@ class MainViewModel : ViewModel(), DefaultLifecycleObserver {
     }
 
     private suspend fun populateUserInDB(userData: UserData) {
-        projectRepository.populateUserInDB(userData).fold({
-            Log.e("ERROR", "Failed to save user data")
+        projectRepository.clearDB().fold({
+            Log.e("ERROR", "Failed to delete old user data")
         }, {
-            projectRepository.fetchUserFromDB().fold({
-
+            projectRepository.populateUserInDB(userData).fold({
+                Log.e("ERROR", "Failed to save user data")
             }, {
-                Log.d("DEBUG", "user list $it")
+                projectRepository.fetchUserFromDB().fold({
+
+                }, {
+                    Log.d("DEBUG", "user list $it")
+                })
             })
         })
     }

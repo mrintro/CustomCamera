@@ -15,5 +15,9 @@ interface ProjectDao {
     @Query("SELECT * from UserData")
     suspend fun getUser(): List<UserData>
 
+    @Query("DELETE FROM UserData")
+    suspend fun deleteAllData()
+
+
 
 }
