@@ -6,24 +6,30 @@ import android.text.TextWatcher
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import aniket.testapplication.CameraApplication
 import aniket.testapplication.R
 import aniket.testapplication.databinding.FragmentHomeBinding
+import aniket.testapplication.utils.HomeFragmentState
+import aniket.testapplication.viewmodel.GlobalViewModel
 import aniket.testapplication.viewmodel.MainViewModel
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private val mainViewModel by viewModels<MainViewModel>()
+    private val globalViewModel by activityViewModels<GlobalViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         with((requireActivity().application as CameraApplication).applicationComponent) {
             inject(this@HomeFragment)
             inject(mainViewModel)
+            inject(globalViewModel)
         }
         lifecycle.addObserver(mainViewModel)
+        lifecycle.addObserver(globalViewModel)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -33,18 +39,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
             lifecycleOwner = viewLifecycleOwner
             vm = mainViewModel
-            mainViewModel.navigateToCameraScreen.observe(viewLifecycleOwner) {
-                if(it==true){
-                    mainViewModel.navigateToCameraScreen.postValue(false)
-                    navigateToCameraScreen()
-                }
-            }
+
 
 
             nameEditText.addTextChangedListener(nameEditTextWatcher)
             emailEditText.addTextChangedListener(emailEditTextWatcher)
 
         }
+
+        observeFragmentState()
+
 
     }
 
@@ -80,6 +84,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             // No implementation
         }
 
+    }
+
+
+    private fun observeFragmentState() {
+        mainViewModel.homeFragmentState.observe(viewLifecycleOwner) {
+            when(it) {
+                is HomeFragmentState.NavigateToCameraScreen -> navigateToCameraScreen()
+                is HomeFragmentState.SaveToken -> globalViewModel.setTokenData(it.authResponseHeader)
+                else -> Unit
+            }
+        }
     }
 
 }

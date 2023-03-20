@@ -1,6 +1,5 @@
 package aniket.testapplication.di.component
 
-import android.app.Application
 import android.content.Context
 import aniket.testapplication.MainActivity
 import aniket.testapplication.di.annotations.ApplicationScope
@@ -8,6 +7,7 @@ import aniket.testapplication.di.modules.ApplicationModule
 import aniket.testapplication.di.modules.NetworkModule
 import aniket.testapplication.ui.HomeFragment
 import aniket.testapplication.ui.SingleImageFragment
+import aniket.testapplication.viewmodel.GlobalViewModel
 import aniket.testapplication.viewmodel.MainViewModel
 import dagger.BindsInstance
 import dagger.Component
@@ -28,5 +28,7 @@ interface ApplicationComponent {
     fun inject(singleImageFragment: SingleImageFragment)
 
     fun inject(viewModel: MainViewModel)
+
+    fun inject(globalViewModel: GlobalViewModel)
 
 }
