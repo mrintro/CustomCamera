@@ -40,8 +40,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             lifecycleOwner = viewLifecycleOwner
             vm = mainViewModel
 
-
-
             nameEditText.addTextChangedListener(nameEditTextWatcher)
             emailEditText.addTextChangedListener(emailEditTextWatcher)
 
