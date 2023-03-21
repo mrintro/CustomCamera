@@ -71,7 +71,7 @@ class MainViewModel : ViewModel(), DefaultLifecycleObserver {
         })
     }
 
-    private suspend fun fetchAPIToken() {
+    private fun fetchAPIToken() {
         projectRepository.fetchAPIToken().fold({
             Log.e("ERROR", "Cannot fetch token for token API, $it")
         }, {
@@ -89,7 +89,7 @@ class MainViewModel : ViewModel(), DefaultLifecycleObserver {
                     }
                 }
                 override fun onFailure(call: Call<AuthAPIResponse>, t: Throwable) {
-                    Log.e("ERROR", "Cannot fetch token for token API after callback, $it")
+                    Log.e("ERROR", "Cannot fetch token for token API after callback, $t")
                 }
             } )
         })
