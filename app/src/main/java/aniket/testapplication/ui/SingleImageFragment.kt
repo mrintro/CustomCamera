@@ -13,10 +13,12 @@ import android.widget.FrameLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import aniket.testapplication.CameraApplication
 import aniket.testapplication.R
 import aniket.testapplication.databinding.FragmentSingleImageBinding
 import aniket.testapplication.viewmodel.GlobalViewModel
+import aniket.testapplication.viewmodel.SingleImageViewModel
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -27,6 +29,7 @@ import java.util.*
 class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
 
     private val globalViewModel by activityViewModels<GlobalViewModel>()
+    private val singleImageViewModel by viewModels<SingleImageViewModel>()
 
     private var mCamera: Camera? = null
     private var mPreview: CameraPreview? = null
@@ -54,7 +57,9 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
         with((requireActivity().application as CameraApplication).applicationComponent) {
             inject(this@SingleImageFragment)
             inject(globalViewModel)
+            inject(singleImageViewModel)
         }
+        lifecycle.addObserver(singleImageViewModel)
         isCameraSuported = checkCameraHardware(requireContext())
     }
 
@@ -63,12 +68,12 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
         Log.d("Getting Auth Header here", "Auth Header ${globalViewModel.authTokenData.value}")
 
         DataBindingUtil.bind<FragmentSingleImageBinding>(view)?.apply {
+            lifecycleOwner = viewLifecycleOwner
+            vm = singleImageViewModel
+            singleImageViewModel.startProgress()
             if (isCameraSuported == true) {
                 mCamera = getCameraInstance()
-                mCamera?.let { CameraPreview(requireContext(), it) }
-
-                // Set the Preview view as the content of our activity.
-                mPreview?.also {
+                mCamera?.let { CameraPreview(requireContext(), it) }?.also {
                     cameraPreview.addView(it)
                 }
             }

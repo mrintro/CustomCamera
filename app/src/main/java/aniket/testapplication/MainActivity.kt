@@ -10,7 +10,7 @@ import aniket.testapplication.utils.Constants.PERMISSION_REQUEST_CODE
 class MainActivity : AppCompatActivity() {
 
 
-    var permissionsStr = arrayOf(
+    private var permissionsStr = arrayOf(
         android.Manifest.permission.CAMERA,
         android.Manifest.permission.READ_EXTERNAL_STORAGE
     )

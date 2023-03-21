@@ -9,6 +9,7 @@ import aniket.testapplication.ui.HomeFragment
 import aniket.testapplication.ui.SingleImageFragment
 import aniket.testapplication.viewmodel.GlobalViewModel
 import aniket.testapplication.viewmodel.MainViewModel
+import aniket.testapplication.viewmodel.SingleImageViewModel
 import dagger.BindsInstance
 import dagger.Component
 
@@ -30,5 +31,7 @@ interface ApplicationComponent {
     fun inject(viewModel: MainViewModel)
 
     fun inject(globalViewModel: GlobalViewModel)
+
+    fun inject(singleImageViewModel: SingleImageViewModel)
 
 }
