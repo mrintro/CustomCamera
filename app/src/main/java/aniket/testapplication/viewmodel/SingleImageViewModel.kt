@@ -9,10 +9,10 @@ class SingleImageViewModel: ViewModel(), DefaultLifecycleObserver {
     private val progressTimeInMilli = 20000L
     private val progressGapInMilli = 2000L
 
-    private val _progressPercent = MutableLiveData<Int>(100)
+    private val _progressPercent = MutableLiveData(100)
     val progressPercent : LiveData<Int> = _progressPercent
 
-    private val _remainingTime = MutableLiveData<Long>(progressTimeInMilli)
+    private val _remainingTime = MutableLiveData(progressTimeInMilli)
     val remainingTime : LiveData<Long> = _remainingTime
 
     fun startProgress() {

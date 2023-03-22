@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.hardware.Camera
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -25,26 +26,28 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-
+@Suppress("Deprecation")
 class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
 
     private val globalViewModel by activityViewModels<GlobalViewModel>()
     private val singleImageViewModel by viewModels<SingleImageViewModel>()
 
     private var mCamera: Camera? = null
-    private var mPreview: CameraPreview? = null
     private var isCameraSuported: Boolean? = false
 
     private val mPicture = Camera.PictureCallback { data, _ ->
+
         val pictureFile: File = getOutputMediaFile(MEDIA_TYPE_IMAGE) ?: run {
             Log.d("Aniket", ("Error creating media file, check storage permissions"))
             return@PictureCallback
         }
+        val Uri = Uri.fromFile(getOutputMediaFile(MEDIA_TYPE_IMAGE))
 
         try {
             val fos = FileOutputStream(pictureFile)
             fos.write(data)
             fos.close()
+            singleImageViewModel.startProgress()
         } catch (e: FileNotFoundException) {
             Log.e("Aniket", "File not found: ${e.message}")
         } catch (e: IOException) {
@@ -70,22 +73,25 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
         DataBindingUtil.bind<FragmentSingleImageBinding>(view)?.apply {
             lifecycleOwner = viewLifecycleOwner
             vm = singleImageViewModel
-            singleImageViewModel.startProgress()
             if (isCameraSuported == true) {
                 mCamera = getCameraInstance()
-                mCamera?.let { CameraPreview(requireContext(), it) }?.also {
-                    cameraPreview.addView(it)
+
+                mCamera?.let { context?.let { it1 ->
+                    CameraPreview(it1, it) {
+                        if (isCameraSuported == true) it.takePicture(null, null, mPicture)
+                    }
+
+                }}?.also {
+                    val preview: FrameLayout = cameraPreview
+                    preview.addView(it)
                 }
             }
-            dummy.setOnClickListener {
-                if (isCameraSuported == true) mCamera?.takePicture(null, null, mPicture)
-            }
+
+
 
         }
 
     }
-
-
 
     private fun checkCameraHardware(context: Context): Boolean {
         return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
@@ -95,6 +101,7 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
         return try {
             Camera.open()
         } catch (e: Exception) {
+            Log.e("Aniket", "Aniket :" + e.message )
             null
         }
     }
@@ -102,7 +109,8 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
     /** A basic Camera preview class */
     internal class CameraPreview(
         context: Context,
-        private val mCamera: Camera
+        private val mCamera: Camera,
+        private val block: () -> Unit
     ) : SurfaceView(context), SurfaceHolder.Callback {
 
         private val mHolder: SurfaceHolder = holder.apply {
@@ -116,6 +124,7 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
                 try {
                     setPreviewDisplay(holder)
                     startPreview()
+                    block.invoke()
                 } catch (e: IOException) {
                     Log.d("Aniket", "Error setting camera preview: ${e.message}")
                 }
@@ -135,6 +144,7 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
             try {
                 mCamera.stopPreview()
             } catch (e: Exception) {
+                Log.e("Aniket", "Error setting camera preview: ${e.message}")
                 // ignore: tried to stop a non-existent preview
             }
 
@@ -146,8 +156,9 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
                 try {
                     setPreviewDisplay(mHolder)
                     startPreview()
+                    block.invoke()
                 } catch (e: Exception) {
-                    Log.d("Aniket", "Error starting camera preview: ${e.message}")
+                    Log.e("Aniket", "Error starting camera preview: ${e.message}")
                 }
             }
         }
@@ -162,19 +173,20 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
         return Uri.fromFile(getOutputMediaFile(type))
     }
 
-
-
     /** Create a File for saving an image or video */
     private fun getOutputMediaFile(type: Int): File? {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
-        val mediaStorageDir = context?.filesDir
+        val mediaStorageDir = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+            "MyCameraApp"
+        )
 
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
-        mediaStorageDir?.apply {
+        mediaStorageDir.apply {
             if (!exists()) {
                 if (!mkdirs()) {
                     Log.d("MyCameraApp", "failed to create directory")
@@ -203,6 +215,7 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
 
     private fun releaseCamera() {
         mCamera?.release() // release the camera for other applications
+        Log.d("Aniket", "releaseCamera called")
         mCamera = null
     }
 
