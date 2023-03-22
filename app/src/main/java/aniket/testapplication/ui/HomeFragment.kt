@@ -12,7 +12,7 @@ import androidx.navigation.fragment.findNavController
 import aniket.testapplication.CameraApplication
 import aniket.testapplication.R
 import aniket.testapplication.databinding.FragmentHomeBinding
-import aniket.testapplication.utils.HomeFragmentState
+import aniket.testapplication.HomeFragmentState
 import aniket.testapplication.viewmodel.GlobalViewModel
 import aniket.testapplication.viewmodel.MainViewModel
 

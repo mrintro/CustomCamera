@@ -6,7 +6,7 @@ import aniket.testapplication.model.AuthAPIResponse
 import aniket.testapplication.model.AuthResponseHeader
 import aniket.testapplication.model.UserData
 import aniket.testapplication.repository.ProjectRepository
-import aniket.testapplication.utils.HomeFragmentState
+import aniket.testapplication.HomeFragmentState
 import aniket.testapplication.utils.SingleLiveEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

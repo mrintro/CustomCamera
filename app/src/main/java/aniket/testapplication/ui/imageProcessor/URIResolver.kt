@@ -14,7 +14,7 @@ typealias URIMetaCallback = (meta: URIMeta?) -> Unit
 
 class URIResolver {
 
-    private val contentScheme = "content"
+    private val contentScheme = "file"
 
     fun resolve(context: Context, uri: Uri, uriMetaListener: URIMetaCallback) {
         when {
@@ -63,7 +63,7 @@ class URIResolver {
         selection: String? = null,
         selectionArgs: Array<String>? = null,
         order: String? = null
-    ): Cursor? = context.contentResolver.query(
+    ) = context.contentResolver.query(
         uri, projections, selection, selectionArgs, order
     )
 

@@ -1,19 +1,24 @@
 package aniket.testapplication.viewmodel
 
 import androidx.lifecycle.*
+import aniket.testapplication.SingleImageFragmentState
+import aniket.testapplication.utils.SingleLiveEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SingleImageViewModel: ViewModel(), DefaultLifecycleObserver {
 
-    private val progressTimeInMilli = 20000L
+    private val progressTimeInMilli = 4000L
     private val progressGapInMilli = 2000L
 
     private val _progressPercent = MutableLiveData(100)
     val progressPercent : LiveData<Int> = _progressPercent
 
-    private val _remainingTime = MutableLiveData(progressTimeInMilli)
+    private val _remainingTime = MutableLiveData(progressTimeInMilli/1000)
     val remainingTime : LiveData<Long> = _remainingTime
+
+
+    val singleImageFragmentState = SingleLiveEvent<SingleImageFragmentState>()
 
     fun startProgress() {
         var remainingTimeValue = progressTimeInMilli
@@ -24,6 +29,7 @@ class SingleImageViewModel: ViewModel(), DefaultLifecycleObserver {
                 delay(progressGapInMilli)
                 remainingTimeValue -= progressGapInMilli
             }
+            singleImageFragmentState.value = SingleImageFragmentState.TimerFinished
         }
     }
 

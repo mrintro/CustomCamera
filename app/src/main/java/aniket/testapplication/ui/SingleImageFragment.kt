@@ -15,8 +15,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import aniket.testapplication.CameraApplication
+import aniket.testapplication.HomeFragmentState
 import aniket.testapplication.R
+import aniket.testapplication.SingleImageFragmentState
 import aniket.testapplication.databinding.FragmentSingleImageBinding
 import aniket.testapplication.ui.imageProcessor.URIResolver
 import aniket.testapplication.viewmodel.GlobalViewModel
@@ -36,7 +39,7 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
     private val singleImageViewModel by viewModels<SingleImageViewModel>()
 
     private var mCamera: Camera? = null
-    private var isCameraSuported: Boolean? = false
+    private var isCameraSupported: Boolean? = false
 
     @Inject
     lateinit var uriResolver: URIResolver
@@ -49,7 +52,7 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
             inject(singleImageViewModel)
         }
         lifecycle.addObserver(singleImageViewModel)
-        isCameraSuported = checkCameraHardware(requireContext())
+        isCameraSupported = checkCameraHardware(requireContext())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,23 +62,21 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
         DataBindingUtil.bind<FragmentSingleImageBinding>(view)?.apply {
             lifecycleOwner = viewLifecycleOwner
             vm = singleImageViewModel
-            if (isCameraSuported == true) {
+            if (isCameraSupported == true) {
                 mCamera = getCameraInstance()
 
                 mCamera?.let { context?.let { it1 ->
                     CameraPreview(it1, it) {
-                        if (isCameraSuported == true) it.takePicture(null, null, mPicture)
+                        if (isCameraSupported == true) it.takePicture(null, null, mPicture)
                     }
-
                 }}?.also {
                     val preview: FrameLayout = cameraPreview
                     preview.addView(it)
                 }
             }
-
-
-
         }
+
+        observeFragmentState()
 
     }
 
@@ -92,7 +93,7 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
             fos.write(data)
             fos.close()
             val uri = Uri.fromFile(getOutputMediaFile(MEDIA_TYPE_IMAGE))
-            fetchImageUsingURI(uri)
+            globalViewModel.setSingleImageUri(uri)
             singleImageViewModel.startProgress()
         } catch (e: FileNotFoundException) {
             Log.e("Aniket", "File not found: ${e.message}")
@@ -241,5 +242,18 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
         releaseCamera()
     }
 
+    private fun navigateToMultipleImageScreen() {
+        findNavController().navigate(SingleImageFragmentDirections.actionSingleImageToMultipleImage())
+    }
+
+
+    private fun observeFragmentState() {
+        singleImageViewModel.singleImageFragmentState.observe(viewLifecycleOwner) {
+            when(it) {
+                is SingleImageFragmentState.TimerFinished -> navigateToMultipleImageScreen()
+                else -> Unit
+            }
+        }
+    }
 
 }

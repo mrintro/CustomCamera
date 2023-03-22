@@ -21,6 +21,18 @@
         android:id="@+id/singleImageFragment"
         android:name="aniket.testapplication.ui.SingleImageFragment"
         android:label="fragment_single_image"
-        tools:layout="@layout/fragment_single_image" />
+        tools:layout="@layout/fragment_single_image">
+
+        <action
+            android:id="@+id/actionSingleImageToMultipleImage"
+            app:destination="@id/multipleImageFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/multipleImageFragment"
+        android:name="aniket.testapplication.ui.MultipleImageFragment"
+        android:label="fragment_multiple_image"
+        tools:layout="@layout/fragment_multiple_image" />
 
 </navigation>
