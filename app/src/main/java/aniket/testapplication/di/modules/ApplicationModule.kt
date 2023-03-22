@@ -7,6 +7,7 @@ import aniket.testapplication.repository.ProjectRepository
 import aniket.testapplication.repository.db.ProjectDB
 import aniket.testapplication.repository.db.ProjectDao
 import aniket.testapplication.repository.service.APIService
+import aniket.testapplication.ui.imageProcessor.URIResolver
 import dagger.Module
 import dagger.Provides
 
@@ -25,5 +26,8 @@ class ApplicationModule {
         service: APIService
     ) = ProjectRepository(roomDB, service)
 
+    @ApplicationScope
+    @Provides
+    fun getURIResolver() = URIResolver()
 
 }

@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import aniket.testapplication.CameraApplication
 import aniket.testapplication.R
 import aniket.testapplication.databinding.FragmentSingleImageBinding
+import aniket.testapplication.ui.imageProcessor.URIResolver
 import aniket.testapplication.viewmodel.GlobalViewModel
 import aniket.testapplication.viewmodel.SingleImageViewModel
 import java.io.File
@@ -26,6 +27,8 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
+
 @Suppress("Deprecation")
 class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
 
@@ -35,25 +38,8 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
     private var mCamera: Camera? = null
     private var isCameraSuported: Boolean? = false
 
-    private val mPicture = Camera.PictureCallback { data, _ ->
-
-        val pictureFile: File = getOutputMediaFile(MEDIA_TYPE_IMAGE) ?: run {
-            Log.d("Aniket", ("Error creating media file, check storage permissions"))
-            return@PictureCallback
-        }
-        val Uri = Uri.fromFile(getOutputMediaFile(MEDIA_TYPE_IMAGE))
-
-        try {
-            val fos = FileOutputStream(pictureFile)
-            fos.write(data)
-            fos.close()
-            singleImageViewModel.startProgress()
-        } catch (e: FileNotFoundException) {
-            Log.e("Aniket", "File not found: ${e.message}")
-        } catch (e: IOException) {
-            Log.e("Aniket", "Error accessing file: ${e.message}")
-        }
-    }
+    @Inject
+    lateinit var uriResolver: URIResolver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +77,35 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
 
         }
 
+    }
+
+
+    private val mPicture = Camera.PictureCallback { data, _ ->
+
+        val pictureFile: File = getOutputMediaFile(MEDIA_TYPE_IMAGE) ?: run {
+            Log.d("Aniket", ("Error creating media file, check storage permissions"))
+            return@PictureCallback
+        }
+
+        try {
+            val fos = FileOutputStream(pictureFile)
+            fos.write(data)
+            fos.close()
+            val uri = Uri.fromFile(getOutputMediaFile(MEDIA_TYPE_IMAGE))
+            fetchImageUsingURI(uri)
+            singleImageViewModel.startProgress()
+        } catch (e: FileNotFoundException) {
+            Log.e("Aniket", "File not found: ${e.message}")
+        } catch (e: IOException) {
+            Log.e("Aniket", "Error accessing file: ${e.message}")
+        }
+    }
+
+
+    private fun fetchImageUsingURI(uri: Uri) {
+        uriResolver.resolve(requireContext(), uri) { meta ->
+            Log.d("DEBUG", "Getting URI META of image $meta")
+        }
     }
 
     private fun checkCameraHardware(context: Context): Boolean {
