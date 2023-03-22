@@ -84,7 +84,7 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
     private val mPicture = Camera.PictureCallback { data, _ ->
 
         val pictureFile: File = getOutputMediaFile(MEDIA_TYPE_IMAGE) ?: run {
-            Log.d("Aniket", ("Error creating media file, check storage permissions"))
+            Log.e("ERROR", ("Error creating media file, check storage permissions"))
             return@PictureCallback
         }
 
@@ -92,13 +92,12 @@ class SingleImageFragment : Fragment(R.layout.fragment_single_image) {
             val fos = FileOutputStream(pictureFile)
             fos.write(data)
             fos.close()
-            val uri = Uri.fromFile(getOutputMediaFile(MEDIA_TYPE_IMAGE))
-            globalViewModel.setSingleImageUri(uri)
+            globalViewModel.setSingleImageFile(pictureFile)
             singleImageViewModel.startProgress()
         } catch (e: FileNotFoundException) {
-            Log.e("Aniket", "File not found: ${e.message}")
+            Log.e("ERROR", "File not found: ${e.message}")
         } catch (e: IOException) {
-            Log.e("Aniket", "Error accessing file: ${e.message}")
+            Log.e("ERROR", "Error accessing file: ${e.message}")
         }
     }
 
