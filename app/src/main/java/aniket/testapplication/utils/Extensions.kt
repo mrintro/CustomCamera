@@ -2,7 +2,6 @@ package aniket.testapplication.utils
 
 import android.hardware.Camera
 import android.hardware.Camera.Parameters.FOCUS_MODE_FIXED
-import android.renderscript.Sampler
 import android.util.Log
 import java.io.File
 import java.io.FileOutputStream

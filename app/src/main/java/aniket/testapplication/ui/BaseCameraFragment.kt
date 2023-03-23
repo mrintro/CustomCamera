@@ -5,10 +5,9 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
-import android.hardware.Camera.PictureCallback
-import android.hardware.Camera.PreviewCallback
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.view.TextureView
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -16,7 +15,6 @@ import aniket.testapplication.utils.Constants.PROJECT_DIR
 import aniket.testapplication.utils.postData
 import aniket.testapplication.utils.setISOAndFocusForCamera
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.*
 
 @Suppress("Deprecation")
@@ -39,6 +37,12 @@ open class BaseCameraFragment(
     }
 
     private fun createCameraObject(iso: Int = 100) {
+        val cameras = Camera.getNumberOfCameras()
+        val cameraInfo = Camera.CameraInfo()
+        for(cameraNumber in 0 until cameras) {
+            Camera.getCameraInfo(cameraNumber, cameraInfo)
+            Log.d("Debug", "$cameraNumber")
+        }
         camera = kotlin.runCatching { Camera.open() }.onFailure { throw (it) }.getOrNull()
         camera?.apply {
             setISOAndFocusForCamera(iso)
@@ -59,7 +63,7 @@ open class BaseCameraFragment(
         cameraPreviewInitialized = block
     }
 
-    class PhotoHandler(private val callbackOnSuccess: (File)->Unit): PictureCallback {
+    class PhotoHandler(private val callbackOnSuccess: (File)->Unit): Camera.PictureCallback {
         @Deprecated("Deprecated in Java")
         override fun onPictureTaken(data: ByteArray?, camera: Camera?) {
             createProjectDir()?.let {
@@ -75,7 +79,7 @@ open class BaseCameraFragment(
             camera?.let {
                 it.parameters.let {params ->
                     params.get("iso")
-                    params.get("iso").toString() + params.exposureCompensation.toString()
+                    "iso" + params.get("iso").toString() + "_ev" + params.exposureCompensation.toString()
                 }
             } ?: "unk_val"
 
@@ -93,7 +97,7 @@ open class BaseCameraFragment(
 
     }
 
-    private val previewCallBack = PreviewCallback { _, camera ->
+    private val previewCallBack = Camera.PreviewCallback { _, camera ->
         camera?.let{
             cameraPreviewInitialized.invoke(it)
         }
@@ -129,11 +133,19 @@ open class BaseCameraFragment(
     }
 
     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         camera?.release()
+    }
+
+    fun resetPreview() {
+        camera?.apply {
+            stopPreview()
+            startPreview()
+        }
     }
 
 }

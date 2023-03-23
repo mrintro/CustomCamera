@@ -25,7 +25,8 @@
 
         <action
             android:id="@+id/actionSingleImageToMultipleImage"
-            app:destination="@id/multipleImageFragment" />
+            app:destination="@id/multipleImageFragment"
+            app:popUpTo="@id/homeFragment"/>
 
     </fragment>
 

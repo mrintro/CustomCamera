@@ -10,3 +10,7 @@ sealed class HomeFragmentState {
 sealed class SingleImageFragmentState {
     object TimerFinished : SingleImageFragmentState()
 }
+
+sealed class MultipleImageFragmentState {
+    data class CaptureImageWithEV(val ev: Int) : MultipleImageFragmentState()
+}
