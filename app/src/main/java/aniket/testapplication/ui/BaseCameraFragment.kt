@@ -14,6 +14,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import aniket.testapplication.utils.Constants.PROJECT_DIR
 import aniket.testapplication.utils.postData
+import aniket.testapplication.utils.setISOAndFocusForCamera
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,7 +35,14 @@ open class BaseCameraFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        createCameraObject()
+    }
+
+    private fun createCameraObject(iso: Int = 100) {
         camera = kotlin.runCatching { Camera.open() }.onFailure { throw (it) }.getOrNull()
+        camera?.apply {
+            setISOAndFocusForCamera(iso)
+        }
     }
 
     private fun checkCameraHardware(context: Context): Boolean {
@@ -55,14 +63,22 @@ open class BaseCameraFragment(
         @Deprecated("Deprecated in Java")
         override fun onPictureTaken(data: ByteArray?, camera: Camera?) {
             createProjectDir()?.let {
-                val imageFile = getImageFile(it)
+                val suffixFileName = getISOAndEVString(camera)
+                val imageFile = getImageFile(it, suffixFileName)
                 imageFile.postData(data)?.let {capturedFile ->
                     callbackOnSuccess.invoke(capturedFile)
                 }
             }
-
-
         }
+
+        private fun getISOAndEVString(camera: Camera?) =
+            camera?.let {
+                it.parameters.let {params ->
+                    params.get("iso")
+                    params.get("iso").toString() + params.exposureCompensation.toString()
+                }
+            } ?: "unk_val"
+
 
         private fun createProjectDir() : File? {
             val rootDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
@@ -70,9 +86,9 @@ open class BaseCameraFragment(
             return if(!projectDir.exists() && !projectDir.mkdirs()) null else projectDir
         }
         @SuppressLint("SimpleDateFormat")
-        private fun getImageFile(dirFile: File) : File {
-            val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-            return File("${dirFile.path}${File.separator}IMG_$dateFormat.jpg")
+        private fun getImageFile(dirFile: File, suffixName: String) : File {
+//            val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+            return File("${dirFile.path}${File.separator}IMG_$suffixName.jpg")
         }
 
     }
