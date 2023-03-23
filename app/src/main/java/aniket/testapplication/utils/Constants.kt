@@ -4,6 +4,7 @@ object Constants {
 
     const val BASE_URL = "https://foo.bar/"
     const val PERMISSION_REQUEST_CODE = 1
+    const val PROJECT_DIR = "projectCamera"
 
 }
 
