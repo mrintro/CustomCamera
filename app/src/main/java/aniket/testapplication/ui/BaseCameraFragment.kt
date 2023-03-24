@@ -105,8 +105,8 @@ open class BaseCameraFragment(
 
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
 
-        kotlin.runCatching {
-            camera?.apply {
+        camera?.apply {
+            kotlin.runCatching {
                 val cameraParams = parameters
                 cameraParams.setRotation(90)
                 parameters = cameraParams
@@ -114,9 +114,9 @@ open class BaseCameraFragment(
                 setDisplayOrientation(90)
                 setPreviewCallback(previewCallBack)
                 startPreview()
+            }.onFailure {
+                throw (it)
             }
-        }.onFailure {
-            throw (it)
         }
     }
 
@@ -124,11 +124,11 @@ open class BaseCameraFragment(
     }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-        kotlin.runCatching {
-            camera?.apply {
+        camera?.apply {
+            kotlin.runCatching {
                 stopPreview()
-            }
-        }.onFailure { throw (it) }
+            }.onFailure { throw (it) }
+        }
         return true
     }
 
@@ -139,6 +139,7 @@ open class BaseCameraFragment(
     override fun onDestroyView() {
         super.onDestroyView()
         camera?.release()
+        Log.d("Echecing", "asdfjkalsd")
     }
 
     fun resetPreview() {
