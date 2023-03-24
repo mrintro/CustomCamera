@@ -2,11 +2,13 @@ package aniket.testapplication.ui
 
 import android.hardware.Camera
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import aniket.testapplication.CameraApplication
+import aniket.testapplication.MultipleImageFragmentState
 import aniket.testapplication.R
 import aniket.testapplication.databinding.FragmentMultipleImageBinding
 import aniket.testapplication.utils.setEVValueForCamera
@@ -51,16 +53,15 @@ class MultipleImageFragment : BaseCameraFragment(R.layout.fragment_multiple_imag
                 }
             }
         }
+        observeEvents()
     }
 
     private fun startTest(camera: Camera) {
         multipleImageViewModel.currentEV.observe(viewLifecycleOwner) {
-            binding?.headerTitle?.text = String.format(requireContext().getString(R.string.capturing_image_ev), it.toString())
+            binding?.headerTitle?.text = String.format(getString(R.string.capturing_image_ev), it.toString())
             camera.apply {
                 setEVValueForCamera(it)
-                takePicture(null, null, PhotoHandler {file ->
-                    onSuccessCallback(file)
-                })
+                takePicture(null, null, photoHandler)
             }
         }
     }
@@ -68,6 +69,32 @@ class MultipleImageFragment : BaseCameraFragment(R.layout.fragment_multiple_imag
     private fun onSuccessCallback(file: File) {
         resetPreview()
         multipleImageViewModel.setImageFile(file)
+    }
+
+    private fun postImages() {
+        binding?.headerTitle?.text = getString(R.string.sending_image)
+        multipleImageViewModel.getUploadFile()?.let {
+            globalViewModel.postImage(it)
+        } ?: run {
+            Log.e("ERROR", "Cannot find image to upload.")
+        }
+
+    }
+
+    private fun observeEvents() {
+        multipleImageViewModel.multipleImageFragmentState.observe(viewLifecycleOwner) {
+            when(it) {
+                is MultipleImageFragmentState.ImagesCaptured -> postImages()
+                else -> Unit
+            }
+        }
+        globalViewModel.gvmMultipleImageFragmentState.observe(viewLifecycleOwner) {
+            when(it) {
+                is MultipleImageFragmentState.PostImageFailed -> binding?.headerTitle?.text = getString(R.string.test_successful)
+                is MultipleImageFragmentState.PostImageSuccessful -> binding?.headerTitle?.text = getString(R.string.test_failed)
+                else -> Unit
+            }
+        }
     }
 
 }

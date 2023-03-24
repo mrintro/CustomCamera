@@ -81,8 +81,12 @@ class MainViewModel : ViewModel(), DefaultLifecycleObserver {
                     call: Call<AuthAPIResponse>,
                     response: Response<AuthAPIResponse>
                 ) {
-                    val authResponse = response.headers().get("access-token")
-                    homeFragmentState.value = HomeFragmentState.SaveToken(AuthResponseHeader(authResponse.toString()))
+                    val accessToken = response.headers().get("access-token")
+                    homeFragmentState.value = HomeFragmentState.SaveToken(AuthResponseHeader(
+                        accessToken.toString(),
+                        response.headers().get("uid").toString(),
+                        response.headers().get("client").toString()
+                    ))
                     val responseBody = response.body()
                     if(responseBody?.onboarded == true){
                         homeFragmentState.value = HomeFragmentState.NavigateToCameraScreen

@@ -1,14 +1,15 @@
 package aniket.testapplication.viewmodel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import aniket.testapplication.model.AuthResponseHeader
-import aniket.testapplication.model.createImageRequestObject
-import aniket.testapplication.model.toMultipart
+import aniket.testapplication.MultipleImageFragmentState
+import aniket.testapplication.model.*
 import aniket.testapplication.repository.ProjectRepository
+import aniket.testapplication.utils.SingleLiveEvent
 import java.io.File
 import javax.inject.Inject
 
@@ -23,6 +24,8 @@ class GlobalViewModel : ViewModel(), DefaultLifecycleObserver {
     private val _singleImageFile = MutableLiveData<File>()
     val singleImageFile: LiveData<File> = _singleImageFile
 
+    val gvmMultipleImageFragmentState = SingleLiveEvent<MultipleImageFragmentState>()
+
     fun setTokenData(authResponseHeader: AuthResponseHeader) {
         _authTokenData.postValue(authResponseHeader)
     }
@@ -31,12 +34,21 @@ class GlobalViewModel : ViewModel(), DefaultLifecycleObserver {
         _singleImageFile.postValue(file)
     }
 
-    fun postImage() {
-        singleImageFile.value?.let {
-            val multipartFormData = it.toMultipart()
-//            val requestObject = it.createImageRequestObject().toRequestBody()
-
-        }
+    fun postImage(file: File) {
+        val fileMultipartFormData = file.toMultipart()
+        val textMultipartBodyMap = getTextMultipartMap()
+        projectRepository.uploadImage(fileMultipartFormData, textMultipartBodyMap).fold(
+            {
+                Log.e("ERROR", "Cannot Upload Image, $it")
+                gvmMultipleImageFragmentState.value = MultipleImageFragmentState.PostImageFailed
+            },
+            {
+                /**
+                 * Do onResponse here.
+                 */
+                gvmMultipleImageFragmentState.value = MultipleImageFragmentState.PostImageFailed
+            }
+        )
     }
 
 
