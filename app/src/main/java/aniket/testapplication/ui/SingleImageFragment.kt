@@ -48,7 +48,10 @@ class SingleImageFragment : BaseCameraFragment(R.layout.fragment_single_image) {
             vm = singleImageViewModel
 
             setCameraPreviewInitialized {
-                capturePhoto(it)
+                if(!singleImageViewModel.isTestStarted()) {
+                    singleImageViewModel.startTest()
+                    capturePhoto(it)
+                }
             }
             attachListener(textureView)
         }

@@ -14,6 +14,8 @@ class SingleImageViewModel: ViewModel(), DefaultLifecycleObserver {
     private val _progressPercent = MutableLiveData(100)
     val progressPercent : LiveData<Int> = _progressPercent
 
+    private val testStarted = MutableLiveData(false)
+
     private val _remainingTime = MutableLiveData(progressTimeInMilli/1000)
     val remainingTime : LiveData<Long> = _remainingTime
 
@@ -31,6 +33,12 @@ class SingleImageViewModel: ViewModel(), DefaultLifecycleObserver {
             }
             singleImageFragmentState.value = SingleImageFragmentState.TimerFinished
         }
+    }
+
+    fun isTestStarted() = testStarted.value ?: false
+
+    fun startTest() {
+        testStarted.value = true
     }
 
 }
