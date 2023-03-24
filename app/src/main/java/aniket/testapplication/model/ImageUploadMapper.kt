@@ -29,3 +29,10 @@ fun getTextMultipartMap(): Map<String, RequestBody> {
 
 fun getStringPartRequest(string: String) =
     RequestBody.create(MediaType.parse("multipart/form-data"), string)
+
+fun getHeaderMap(authResponseHeader: AuthResponseHeader?) = mutableMapOf<String, String>().apply {
+    put("Content-Type", "application/json")
+    put("access-token", authResponseHeader?.accessToken.toString())
+    put("uid", authResponseHeader?.uid.toString())
+    put("client", authResponseHeader?.client.toString())
+}

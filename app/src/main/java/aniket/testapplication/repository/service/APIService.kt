@@ -6,6 +6,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.HeaderMap
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -26,6 +27,7 @@ interface APIService {
     @POST
     fun uploadImage(
         @Url url: String,
+        @HeaderMap headers: Map<String, String>,
         @PartMap map: Map<String, RequestBody>,
         @Part file: MultipartBody.Part
     ) : Call<Any>

@@ -1,13 +1,15 @@
 package aniket.testapplication.viewmodel
 
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import aniket.testapplication.MultipleImageFragmentState
-import aniket.testapplication.model.*
+import aniket.testapplication.model.AuthResponseHeader
+import aniket.testapplication.model.getHeaderMap
+import aniket.testapplication.model.getTextMultipartMap
+import aniket.testapplication.model.toMultipart
 import aniket.testapplication.repository.ProjectRepository
 import aniket.testapplication.utils.SingleLiveEvent
 import java.io.File
@@ -37,7 +39,8 @@ class GlobalViewModel : ViewModel(), DefaultLifecycleObserver {
     fun postImage(file: File) {
         val fileMultipartFormData = file.toMultipart()
         val textMultipartBodyMap = getTextMultipartMap()
-        projectRepository.uploadImage(fileMultipartFormData, textMultipartBodyMap).fold(
+        val headerMap = getHeaderMap(authTokenData.value)
+        projectRepository.uploadImage(headerMap, fileMultipartFormData, textMultipartBodyMap).fold(
             {
                 Log.e("ERROR", "Cannot Upload Image, $it")
                 gvmMultipleImageFragmentState.value = MultipleImageFragmentState.PostImageFailed
