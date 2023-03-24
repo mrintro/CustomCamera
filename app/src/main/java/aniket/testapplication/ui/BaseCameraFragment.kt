@@ -97,12 +97,6 @@ open class BaseCameraFragment(
 
     }
 
-    private val previewCallBack = Camera.PreviewCallback { _, camera ->
-        camera?.let{
-            cameraPreviewInitialized.invoke(it)
-        }
-    }
-
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
 
         camera?.apply {
@@ -112,10 +106,11 @@ open class BaseCameraFragment(
                 parameters = cameraParams
                 setPreviewTexture(surface)
                 setDisplayOrientation(90)
-                setPreviewCallback(previewCallBack)
                 startPreview()
             }.onFailure {
                 throw (it)
+            }.onSuccess {
+                cameraPreviewInitialized.invoke(this)
             }
         }
     }
