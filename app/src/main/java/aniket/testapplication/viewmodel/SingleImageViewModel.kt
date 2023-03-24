@@ -8,8 +8,8 @@ import kotlinx.coroutines.launch
 
 class SingleImageViewModel: ViewModel(), DefaultLifecycleObserver {
 
-    private val progressTimeInMilli = 4000L
-    private val progressGapInMilli = 2000L
+    private val progressTimeInMilli = 300000L
+    private val progressGapInMilli = 5000L
 
     private val _progressPercent = MutableLiveData(100)
     val progressPercent : LiveData<Int> = _progressPercent
